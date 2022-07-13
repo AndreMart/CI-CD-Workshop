@@ -60,13 +60,16 @@ class StudentSchema(Schema):
 with open("apidoc.json") as file:
         datafile = json.load(file)
 
-@app.route('/', methods = ['GET'])
+
+@app.route('/', methods=['GET'])
 def home():
     return '<p>Hello from students API!</p>', 200
 
-@app.route('/api', methods = ['GET'])
+
+@app.route('/api', methods=['GET'])
 def api_main():
     return jsonify(datafile), 200
+
 
 @app.route('/api/students', methods=['GET'])
 def get_all_students():
@@ -75,14 +78,16 @@ def get_all_students():
     response = student_list.dump(students)
     return jsonify(response), 200
 
-@app.route('/api/students/get/<int:id>', methods = ['GET'])
+
+@app.route('/api/students/get/<int:id>', methods=['GET'])
 def get_student(id):
     student_info = Student.get_by_id(id)
     serializer = StudentSchema()
     response = serializer.dump(student_info)
     return jsonify(response), 200
 
-@app.route('/api/students/add', methods = ['POST'])
+
+@app.route('/api/students/add', methods=['POST'])
 def add_student():
     json_data = request.get_json()
     new_student = Student(
@@ -96,13 +101,15 @@ def add_student():
     data = serializer.dump(new_student)
     return jsonify(data), 201
 
-@app.route('/api/students/delete/<int:id>', methods = ['DELETE'])
+
+@app.route('/api/students/delete/<int:id>', methods=['DELETE'])
 def delete_student(id):
     student_id = Student.get_by_id(id)
     response = Student.delete(student_id)
     return jsonify(response), 200
 
-@app.route('/api/students/modify/<int:id>', methods = ['PATCH'])
+
+@app.route('/api/students/modify/<int:id>', methods=['PATCH'])
 def modify_student(id):
     student_id = Student.get_by_id(id)
     json_data = request.get_json()
@@ -120,7 +127,7 @@ def modify_student(id):
     return jsonify(data), 200     
 
 
-@app.route('/api/students/change/<int:id>', methods = ['PUT'])
+@app.route('/api/students/change/<int:id>', methods=['PUT'])
 def change_student(id):
     student_id = Student.get_by_id(id)
     json_data = request.get_json()
@@ -133,11 +140,13 @@ def change_student(id):
     data = serializer.dump(student_id)
     return jsonify(data), 200   
 
-@app.route('/api/health-check/ok', methods = ['GET'])
+
+@app.route('/api/health-check/ok', methods=['GET'])
 def healthy():
     return 'OK', 200
 
-@app.route('/api/health-check/bad', methods = ['GET'])
+
+@app.route('/api/health-check/bad', methods=['GET'])
 def not_healthy():
     return 'BAD', 500
 
