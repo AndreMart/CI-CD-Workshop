@@ -26,6 +26,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+
 class Student(db.Model):
     __tablename__ = "student"
     id = db.Column(db.Integer, primary_key=True)
@@ -50,12 +51,14 @@ class Student(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+
 class StudentSchema(Schema):
     id = fields.Integer()
     name = fields.Str()
     email = fields.Str()
     age = fields.Integer()
     cellphone = fields.Str()
+
 
 with open("apidoc.json") as file:
         datafile = json.load(file)
@@ -89,12 +92,12 @@ def get_student(id):
 
 @app.route('/api/students/add', methods=['POST'])
 def add_student():
-    json_data = request.get_json()
-    new_student = Student(
-        name = json_data.get('name'),
-        email = json_data.get('email'),
-        age = json_data.get('age'),
-        cellphone = json_data.get('cellphone')
+    json_data=request.get_json()
+    new_student=Student(
+        name=json_data.get('name'),
+        email=json_data.get('email'),
+        age=json_data.get('age'),
+        cellphone=json_data.get('cellphone')
     )
     new_student.save()
     serializer = StudentSchema()
