@@ -92,8 +92,8 @@ def get_student(id):
 
 @app.route('/api/students/add', methods=['POST'])
 def add_student():
-    json_data=request.get_json()
-    new_student=Student(
+    json_data = request.get_json()
+    new_student = Student(
         name=json_data.get('name'),
         email=json_data.get('email'),
         age=json_data.get('age'),
@@ -123,11 +123,11 @@ def modify_student(id):
     if json_data.get('age'):
         student_id.age = json_data.get('age')
     if json_data.get('cellphone'):
-        student_id.cellphone = json_data.get('cellphone') 
+        student_id.cellphone = json_data.get('cellphone')
     student_id.save()
     serializer = StudentSchema()
     data = serializer.dump(student_id)
-    return jsonify(data), 200     
+    return jsonify(data), 200
 
 
 @app.route('/api/students/change/<int:id>', methods=['PUT'])
@@ -137,11 +137,11 @@ def change_student(id):
     student_id.name = json_data.get('name')
     student_id.email = json_data.get('email')
     student_id.age = json_data.get('age')
-    student_id.cellphone = json_data.get('cellphone') 
+    student_id.cellphone = json_data.get('cellphone')
     student_id.save()
     serializer = StudentSchema()
     data = serializer.dump(student_id)
-    return jsonify(data), 200   
+    return jsonify(data), 200
 
 
 @app.route('/api/health-check/ok', methods=['GET'])
