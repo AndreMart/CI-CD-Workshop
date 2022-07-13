@@ -21,7 +21,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.8.10'
 
       - name: flake8 Lint
         uses: py-actions/flake8@v2
