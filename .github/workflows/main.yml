@@ -70,7 +70,6 @@ jobs:
         with:
           host: ${{ matrix.server }}
           username: ${{ secrets.HOSTSUSERNAME }}
-          key: ${{ secrets.KEY }}
           port: 22
           script: |
             # Run mysql image and setup mysql
