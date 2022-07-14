@@ -59,7 +59,7 @@ jobs:
   deploy:
     strategy:
       matrix:
-          server: [35.152.75.102, 35.152.75.102]
+          server: [3.72.112.107, 18.185.15.70]
     runs-on: ubuntu-latest
     name: Deploy
     needs: build_and_push
@@ -116,4 +116,4 @@ jobs:
         uses: jtalk/url-health-check-action@v2
         with:
           # Check the following URLs one by one sequentially
-          url: http://example.com|http://example.com
+          url: http://3.72.112.107:5000/api|http://18.185.15.70:5000/api
