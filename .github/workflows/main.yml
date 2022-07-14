@@ -90,7 +90,6 @@ jobs:
         with:
           host: ${{ matrix.server }}
           username: ${{ secrets.HOSTSUSERNAME }}
-          key: ${{ secrets.KEY }}
           envs: ${{ secrets.DOCKER_USER }}, ${{ secrets.DOCKERHUB_TOKEN }}
           port: 22
           script: |
