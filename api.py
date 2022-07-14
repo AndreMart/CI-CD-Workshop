@@ -61,7 +61,7 @@ class StudentSchema(Schema):
 
 
 with open("apidoc.json") as file:
-        datafile = json.load(file)
+    datafile = json.load(file)
 
 
 @app.route('/', methods=['GET'])
