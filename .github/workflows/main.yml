@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch:
 
 env:
   REGISTRY: andremart/flaskapp
@@ -55,36 +54,66 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}:${{ steps.commit_hash.outputs.commit_hash }}
+            ${{ env.REGISTRY }}:latest
 
-  # deploy:
-  #   strategy:
-  #     matrix:
-  #       os: [ubuntu-latest, ubuntu-latest]
-  #   runs-on: ${{ matrix.os }}
-  #   name: Deploy
-  #   needs: build_and_push
-  #   steps:
-  #     - name: Deploy to EC2 instanse via SSH action
-  #       uses: appleboy/ssh-action@v0.1.3
-  #       with:
-  #         host: ${{ secrets.HOST1 }}
-  #         host2: ${{ secrets.HOST2 }}
-  #         username: ${{ secrets.HOSTSUSERNAME }}
-  #         key: ${{ secrets.KEY }}
-  #         envs: ${{ secrets.DOCKER_USER }}, ${{ secrets.DOCKERHUB_TOKEN }}
-  #         port: 22
-  #         script: |
-  #           # login docker
-  #           docker login -u $DOCKER_USER -p $DOCKERHUB_TOKEN
+  deploy:
+    strategy:
+      matrix:
+          server: [35.152.75.102, 35.152.75.102]
+    runs-on: ubuntu-latest
+    name: Deploy
+    needs: build_and_push
+    steps:
 
-  #           docker stop flask-app
+      - name: Mysql setup
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ matrix.server }}
+          username: ${{ secrets.HOSTSUSERNAME }}
+          key: ${{ secrets.KEY }}
+          port: 22
+          script: |
+            # Run mysql image and setup mysql
+            docker run \
+            --restart always \
+            --name mysql_db \
+            -p 3306:3306 \
+            -v /var/lib/mysql:/var/lib/mysql \
+            -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASS }} \
+            -e MYSQL_USER=${{ secrets.DB_USER }} \
+            -e MYSQL_PASSWORD=${{ secrets.DB_PASS }} \
+            -e MYSQL_DATABASE=${{ secrets.DATABASE }} \
+            -d mysql:8.0.29
 
-  #           docker rm flask-app
+      - name: Deploy to EC2 instanse via SSH action
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ matrix.server }}
+          username: ${{ secrets.HOSTSUSERNAME }}
+          key: ${{ secrets.KEY }}
+          envs: ${{ secrets.DOCKER_USER }}, ${{ secrets.DOCKERHUB_TOKEN }}
+          port: 22
+          script: |
+            # login docker
+            docker login -u $DOCKER_USER -p $DOCKERHUB_TOKEN
 
-  #           # Run a new container from a new image
-  #           docker run -d \
-  #           --restart always \
-  #           -p 5000:5000 \
-  #           --name flask-app \
-  #           ${{ env.REGISTRY }}:${{ needs.build_and_push.outputs.commit_hash }}
+            docker stop flask-app
+
+            docker rm flask-app
+
+            # Run a new container from a new image
+            docker run -d \
+            --restart always \
+            -p 5000:5000 \
+            --name flask-app \
+            ${{ env.REGISTRY }}:${{ needs.build_and_push.outputs.commit_hash }}
+  
+  curl:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Check the deployed service URL
+        uses: jtalk/url-health-check-action@v2
+        with:
+          # Check the following URLs one by one sequentially
+          url: http://example.com|http://example.com
