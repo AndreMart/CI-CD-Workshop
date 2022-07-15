@@ -74,7 +74,7 @@ jobs:
           port: 22
           script: |
             # Run mysql image and setup mysql
-            docker run -d\
+            docker run -d \
             --restart always \
             --name mysql_db \
             -p 3306:3306 \
