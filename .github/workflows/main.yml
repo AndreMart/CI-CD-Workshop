@@ -73,15 +73,8 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-
-            # Deleting old DB
-
-            docker stop mysql_db
-
-            docker rm mysql_db
-
             # Run mysql image and setup mysql
-            docker run \
+            docker run -d\
             --restart always \
             --name mysql_db \
             -p 3306:3306 \
