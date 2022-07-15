@@ -5,5 +5,4 @@ COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 COPY . .
 ENV ENV=development
-RUN apt-get update && apt-get install -y wget
 CMD [ "python3", "api.py"]

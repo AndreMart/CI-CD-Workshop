@@ -75,9 +75,10 @@ jobs:
           script: |
             # Deleting old DB
 
-            sudo docker stop flask-app
+            sudo docker stop mysql_db
 
-            sudo docker rm flask-app
+            sudo docker rm mysql_db
+
             # Run mysql image and setup mysql
             sudo docker run -d \
             --restart always \
@@ -109,11 +110,14 @@ jobs:
             # Run a new container from a new image
             sudo docker run -d \
             --restart always \
-            -p 5000:5000 \
+            -p 80:5000 \
             --name flask-app \
             ${{ env.REGISTRY }}:${{ needs.build_and_push.outputs.commit_hash }}
   
   curl:
+    strategy:
+      matrix:
+          server: [18.193.254.173/api, 3.74.47.14/api]
     runs-on: ubuntu-latest
     needs: deploy
     steps:
@@ -121,4 +125,4 @@ jobs:
         uses: jtalk/url-health-check-action@v2
         with:
           # Check the following URLs one by one sequentially
-          url: http://18.193.254.173:5000/api|http://3.74.47.14:5000/api
+          url: ${{ matrix.server }}
