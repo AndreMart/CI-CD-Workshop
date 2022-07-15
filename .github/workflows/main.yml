@@ -73,6 +73,11 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
+            # Deleting old DB
+
+            docker stop flask-app
+
+            docker rm flask-app
             # Run mysql image and setup mysql
             docker run -d \
             --restart always \
