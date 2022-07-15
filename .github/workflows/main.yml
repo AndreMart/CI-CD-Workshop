@@ -110,7 +110,7 @@ jobs:
             # Run a new container from a new image
             sudo docker run -d \
             --restart always \
-            --network 0.0.0.0
+            --network 0.0.0.0 \
             -p 80:5000 \
             --name flask-app \
             ${{ env.REGISTRY }}:${{ needs.build_and_push.outputs.commit_hash }}
