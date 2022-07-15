@@ -82,7 +82,7 @@ jobs:
             # Run mysql image and setup mysql
             sudo docker run -d \
             --restart always \
-            --network="bridge"
+            --network="bridge" \
             --name mysql_db \
             -p 3306:3306 \
             -v /var/lib/mysql:/var/lib/mysql \
