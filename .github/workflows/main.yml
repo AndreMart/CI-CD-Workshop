@@ -54,7 +54,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}:latest
+            ${{ env.REGISTRY }}:${{ steps.commit_hash.outputs.commit_hash }}
 
   deploy:
     strategy:
@@ -73,6 +73,13 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
+
+            # Deleting old DB
+
+            docker stop mysql_db
+
+            docker rm mysql_db
+
             # Run mysql image and setup mysql
             docker run \
             --restart always \
