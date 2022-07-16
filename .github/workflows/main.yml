@@ -121,7 +121,7 @@ jobs:
     strategy:
       matrix:
           server: [18.193.254.173, 3.74.47.14]
-          port: 5000
+          port: [5000]
     runs-on: ubuntu-latest
     needs: deploy
     steps:
