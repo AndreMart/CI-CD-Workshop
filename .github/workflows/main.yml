@@ -88,7 +88,7 @@ jobs:
                 container_name: flask_app
                 image: ${{ env.REGISTRY }}:${{ needs.build_and_push.outputs.commit_hash }}
                 ports:
-                  - 80:5000
+                  - 5000:5000
                 restart: always
                 depends_on:
                     db:
@@ -120,7 +120,8 @@ jobs:
   curl:
     strategy:
       matrix:
-          server: [18.193.254.173/api, 3.74.47.14/api]
+          server: [18.193.254.173, 3.74.47.14]
+          port: 5000
     runs-on: ubuntu-latest
     needs: deploy
     steps:
@@ -128,4 +129,4 @@ jobs:
         uses: jtalk/url-health-check-action@v2
         with:
           # Check the following URLs one by one sequentially
-          url: ${{ matrix.server }}
+          url: ${{ matrix.server }}:${{ matrix.port }}/api
