@@ -65,34 +65,7 @@ jobs:
     needs: build_and_push
     steps:
 
-      - name: Mysql setup
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ matrix.server }}
-          username: ${{ secrets.HOSTSUSERNAME }}
-          key: ${{ secrets.KEY }}
-          port: 22
-          script: |
-            # Deleting old DB
-
-            sudo docker stop mysql_db
-
-            sudo docker rm mysql_db
-
-            # Run mysql image and setup mysql
-            sudo docker run -d \
-            --restart always \
-            --network="bridge" \
-            --name mysql_db \
-            -p 3306:3306 \
-            -v /var/lib/mysql:/var/lib/mysql \
-            -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASS }} \
-            -e MYSQL_USER=${{ secrets.DB_USER }} \
-            -e MYSQL_PASSWORD=${{ secrets.DB_PASS }} \
-            -e MYSQL_DATABASE=${{ secrets.DATABASE }} \
-            -d mysql:8.0.29
-
-      - name: Deploy to EC2 instanse via SSH action
+      - name: Deploy app to EC2
         uses: appleboy/ssh-action@v0.1.3
         with:
           host: ${{ matrix.server }}
@@ -102,19 +75,49 @@ jobs:
           port: 22
           script: |
             # login docker
-            sudo docker login -u $DOCKER_USER -p $DOCKERHUB_TOKEN
+            docker login -u $DOCKER_USER -p $DOCKERHUB_TOKEN
+            
+            docker compose down
+            
+            # Create docker-compose
+            echo \
+            "version: '2.1'
 
-            sudo docker stop flask-app
+            services:
+              app:
+                container_name: flask_app
+                image: ${{ env.REGISTRY }}:${{ needs.build_and_push.outputs.commit_hash }}
+                ports:
+                  - 80:5000
+                restart: always
+                volumes:
+                - ./:/flaskapp
+                depends_on:
+                    db:
+                        condition: service_healthy
 
-            sudo docker rm flask-app
+              db:
+                container_name: mysql_db
+                image: mysql:8.0.29
+                ports:
+                  - 3306:3306
+                restart: always
+                environment:
+                  MYSQL_ROOT_PASSWORD: devops
+                  MYSQL_USER: devops
+                  MYSQL_PASSWORD: devops
+                  MYSQL_DATABASE: student
+                volumes:
+                  - db:/var/lib/mysql
+                healthcheck:
+                  test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+                  timeout: 20s
+                  retries: 10
 
-            # Run a new container from a new image
-            sudo docker run -d \
-            --restart always \
-            --network="bridge" \
-            -p 80:5000 \
-            --name flask-app \
-            ${{ env.REGISTRY }}:${{ needs.build_and_push.outputs.commit_hash }}
+            volumes:
+              db:" > docker-compose.yml
+
+            docker compose up -d
   
   curl:
     strategy:
