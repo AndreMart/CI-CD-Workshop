@@ -75,9 +75,9 @@ jobs:
           port: 22
           script: |
             # login docker
-            docker login -u $DOCKER_USER -p $DOCKERHUB_TOKEN
+            sudo docker login -u $DOCKER_USER -p $DOCKERHUB_TOKEN
             
-            docker compose down
+            sudo docker-compose down
             
             # Create docker-compose
             echo \
@@ -117,7 +117,7 @@ jobs:
             volumes:
               db:" > docker-compose.yml
 
-            docker compose up -d
+            sudo docker-compose up -d
   
   curl:
     strategy:
